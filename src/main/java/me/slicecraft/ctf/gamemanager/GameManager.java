@@ -11,6 +11,7 @@ import com.sk89q.worldedit.extent.clipboard.io.ClipboardFormats;
 import com.sk89q.worldedit.extent.clipboard.io.ClipboardReader;
 import com.sk89q.worldedit.function.mask.BlockMask;
 import com.sk89q.worldedit.function.mask.BlockTypeMask;
+import com.sk89q.worldedit.function.mask.ExistingBlockMask;
 import com.sk89q.worldedit.function.mask.Mask;
 import com.sk89q.worldedit.function.operation.Operation;
 import com.sk89q.worldedit.function.operation.Operations;
@@ -58,6 +59,7 @@ public class GameManager {
         flagteam2 = null;
         flagholder1 = null;
         flagholder2 = null;
+        resetPlayArea();
         pasteArena();
         playermanager.makeTeams();
         playermanager.teleportToArena();
@@ -148,6 +150,19 @@ public class GameManager {
             BlockVector3 pos2 = BlockVector3.at(ctfplugin.getConfig().getInt("wall.pos2.x"), ctfplugin.getConfig().getInt("wall.pos2.y"), ctfplugin.getConfig().getInt("wall.pos2.z"));
             Region region = new CuboidRegion(new BukkitWorld(ctfplugin.getServer().getWorld(ctfplugin.getConfig().getString("arenaworld"))), pos1, pos2);
             Mask mask = new BlockTypeMask(editSession, BlockTypes.GLASS);
+            editSession.replaceBlocks(region, mask, BlockTypes.AIR.getDefaultState());
+        }catch(MaxChangedBlocksException err){
+
+        }
+    }
+
+    public void resetPlayArea(){
+        WorldEditPlugin worldedit = (WorldEditPlugin) Bukkit.getPluginManager().getPlugin("WorldEdit");
+        try (EditSession editSession = worldedit.getWorldEdit().getInstance().newEditSession(new BukkitWorld(ctfplugin.getServer().getWorld(ctfplugin.getConfig().getString("arenaworld"))))){
+            BlockVector3 pos1 = BlockVector3.at(ctfplugin.getConfig().getInt("playarea.pos1.x"), ctfplugin.getConfig().getInt("playarea.pos1.y"), ctfplugin.getConfig().getInt("playarea.pos1.z"));
+            BlockVector3 pos2 = BlockVector3.at(ctfplugin.getConfig().getInt("playarea.pos2.x"), ctfplugin.getConfig().getInt("playarea.pos2.y"), ctfplugin.getConfig().getInt("playarea.pos2.z"));
+            Region region = new CuboidRegion(new BukkitWorld(ctfplugin.getServer().getWorld(ctfplugin.getConfig().getString("arenaworld"))), pos1, pos2);
+            Mask mask = new ExistingBlockMask(editSession);
             editSession.replaceBlocks(region, mask, BlockTypes.AIR.getDefaultState());
         }catch(MaxChangedBlocksException err){
 

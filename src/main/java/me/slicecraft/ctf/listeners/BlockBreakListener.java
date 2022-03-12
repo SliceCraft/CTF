@@ -4,6 +4,7 @@ import me.slicecraft.ctf.CTF;
 import me.slicecraft.ctf.gamemanager.GameManager;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -11,11 +12,18 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
+import static java.lang.Math.max;
+import static java.lang.Math.min;
+
 public class BlockBreakListener implements Listener{
     Plugin ctfplugin = CTF.getPlugin(CTF.class);
 
     @EventHandler
     public void onBlockBreak(BlockBreakEvent event){
+        Location location = event.getBlock().getLocation();
+        if(!(location.getBlockX() > min(ctfplugin.getConfig().getInt("playarea.pos1.x"), ctfplugin.getConfig().getInt("playarea.pos2.x")) && location.getBlockX() < max(ctfplugin.getConfig().getInt("playarea.pos1.x"), ctfplugin.getConfig().getInt("playarea.pos2.x")) && location.getBlockY() > min(ctfplugin.getConfig().getInt("playarea.pos1.y"), ctfplugin.getConfig().getInt("playarea.pos2.y")) && location.getBlockY() < max(ctfplugin.getConfig().getInt("playarea.pos1.y"), ctfplugin.getConfig().getInt("playarea.pos2.y")) && location.getBlockZ() > min(ctfplugin.getConfig().getInt("playarea.pos1.z"), ctfplugin.getConfig().getInt("playarea.pos2.z")) && location.getBlockZ() < max(ctfplugin.getConfig().getInt("playarea.pos1.z"), ctfplugin.getConfig().getInt("playarea.pos2.z")))){
+            event.setCancelled(true);
+        }
         if(CTF.gamemanager.gamestatus != GameManager.GameStatus.STARTED){
             event.setCancelled(true);
         }else{
