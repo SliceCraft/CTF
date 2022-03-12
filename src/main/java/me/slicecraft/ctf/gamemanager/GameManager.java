@@ -21,10 +21,7 @@ import com.sk89q.worldedit.regions.Region;
 import com.sk89q.worldedit.session.ClipboardHolder;
 import com.sk89q.worldedit.world.block.BlockTypes;
 import me.slicecraft.ctf.CTF;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Location;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -45,6 +42,8 @@ public class GameManager {
     public int time = 60;
     public Location flagteam1 = null;
     public Location flagteam2 = null;
+    public String flagholder1 = null;
+    public String flagholder2 = null;
 
     public enum GameStatus {
         NOTSTARTED,
@@ -57,9 +56,18 @@ public class GameManager {
         gamestatus = GameStatus.HIDE;
         flagteam1 = null;
         flagteam2 = null;
+        flagholder1 = null;
+        flagholder2 = null;
         pasteArena();
         playermanager.makeTeams();
         playermanager.teleportToArena();
+        playermanager.giveFlags();
+        List<Player> playerList = new ArrayList<>(Bukkit.getOnlinePlayers());
+        playerList.forEach(player -> {
+            player.setGameMode(GameMode.SURVIVAL);
+            player.setHealth(20);
+            player.setFoodLevel(20);
+        });
     }
 
     public void startLobbyTimer(){
@@ -86,9 +94,10 @@ public class GameManager {
                     }else if(time == 1){
                         Bukkit.broadcastMessage(ChatColor.GREEN + "You have " + time + " second left to hide the flag!");
                     }else if(time == 0){
-                        // TEMP If timer reaches 0 the block will be place at the players current location unless this is impossible in which case that team auto loses
+                        // TODO If timer reaches 0 the block will be place at the players current location unless this is impossible in which case that team auto loses
                         gamestatus = GameStatus.STARTED;
                         removeWall();
+                        playermanager.giveItemsToEveryone();
                         time = 601;
                     }
                 }else if(gamestatus == GameStatus.STARTED){
@@ -97,6 +106,7 @@ public class GameManager {
                     }else if(time == 60){
                         Bukkit.broadcastMessage(ChatColor.GREEN + "You have " + time/60 + " minute left to capture the flag!");
                     }else if(time == 0){
+                        // TODO Make the game end in a tie
                         Bukkit.broadcastMessage(ChatColor.GREEN + "Placeholder game cancelled");
                         gamestatus = GameStatus.NOTSTARTED;
                         time = 61;
@@ -134,8 +144,8 @@ public class GameManager {
     public void removeWall(){
         WorldEditPlugin worldedit = (WorldEditPlugin) Bukkit.getPluginManager().getPlugin("WorldEdit");
         try (EditSession editSession = worldedit.getWorldEdit().getInstance().newEditSession(new BukkitWorld(ctfplugin.getServer().getWorld(ctfplugin.getConfig().getString("arenaworld"))))){
-            BlockVector3 pos1 = BlockVector3.at(ctfplugin.getConfig().getInt("wallpos1.x"), ctfplugin.getConfig().getInt("wallpos1.y"), ctfplugin.getConfig().getInt("wallpos1.z"));
-            BlockVector3 pos2 = BlockVector3.at(ctfplugin.getConfig().getInt("wallpos2.x"), ctfplugin.getConfig().getInt("wallpos2.y"), ctfplugin.getConfig().getInt("wallpos2.z"));
+            BlockVector3 pos1 = BlockVector3.at(ctfplugin.getConfig().getInt("wall.pos1.x"), ctfplugin.getConfig().getInt("wall.pos1.y"), ctfplugin.getConfig().getInt("wall.pos1.z"));
+            BlockVector3 pos2 = BlockVector3.at(ctfplugin.getConfig().getInt("wall.pos2.x"), ctfplugin.getConfig().getInt("wall.pos2.y"), ctfplugin.getConfig().getInt("wall.pos2.z"));
             Region region = new CuboidRegion(new BukkitWorld(ctfplugin.getServer().getWorld(ctfplugin.getConfig().getString("arenaworld"))), pos1, pos2);
             Mask mask = new BlockTypeMask(editSession, BlockTypes.GLASS);
             editSession.replaceBlocks(region, mask, BlockTypes.AIR.getDefaultState());

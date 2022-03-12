@@ -1,18 +1,29 @@
 arenaworld: world
 buildheightmin: 130
-wallpos1:
-  x: -16
-  y: 144
-  z: -3
-wallpos2:
-  x: 17
-  y: 130
-  z: 0
-team1spawn:
-  x: 0
-  y: 130
-  z: 10
-team2spawn:
-  x: 0
-  y: 130
-  z: -18
+wall:
+  pos1:
+    x: -16
+    y: 144
+    z: -3
+  pos2:
+    x: 17
+    y: 130
+    z: 0
+team1:
+  spawn:
+    x: 0
+    y: 130
+    z: 10
+  drop:
+    x: 0
+    y: 131
+    z: 15
+team2:
+  spawn:
+    x: 0
+    y: 130
+    z: -18
+  drop:
+    x: 0
+    y: 131
+    z: -18
