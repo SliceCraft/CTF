@@ -17,6 +17,10 @@ public class EntityDamageListener implements Listener {
     @EventHandler
     public void onEntityDamage(EntityDamageEvent event){
         if(event.getEntity() instanceof Player){
+            if(CTF.gamemanager.gamestatus != GameManager.GameStatus.STARTED) {
+                event.setCancelled(true);
+                return;
+            }
             Player player = (Player) event.getEntity();
             if(player.getHealth() - event.getFinalDamage() <= 0){
                 event.setCancelled(true);
@@ -51,8 +55,13 @@ public class EntityDamageListener implements Listener {
                 }else if(time > 0){
                     player.sendTitle(ChatColor.RED + "You died!", ChatColor.YELLOW + "You will respawn in " + time + " second", 5, 10, 5);
                 }else{
-                    CTF.gamemanager.playermanager.teleportSinglePlayerToArena(player);
-                    CTF.gamemanager.playermanager.giveItemsToPlayer(player);
+                    if(CTF.gamemanager.gamestatus != GameManager.GameStatus.NOTSTARTED) {
+                        CTF.gamemanager.playermanager.giveItemsToPlayer(player);
+                        CTF.gamemanager.playermanager.teleportSinglePlayerToArena(player);
+                    }else{
+                        player.getInventory().clear();
+                        player.teleport(new Location(ctfplugin.getServer().getWorld(ctfplugin.getConfig().getString("lobby.world")), ctfplugin.getConfig().getInt("lobby.x"), ctfplugin.getConfig().getInt("lobby.y"), ctfplugin.getConfig().getInt("lobby.z")));
+                    }
                     player.setGameMode(GameMode.SURVIVAL);
                     cancel();
                 }

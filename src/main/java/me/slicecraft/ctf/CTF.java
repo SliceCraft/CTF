@@ -4,9 +4,7 @@ import me.slicecraft.ctf.commands.BuildCommand;
 import me.slicecraft.ctf.commands.DisableCommand;
 import me.slicecraft.ctf.commands.MaketeamsCommand;
 import me.slicecraft.ctf.gamemanager.GameManager;
-import me.slicecraft.ctf.listeners.BlockBreakListener;
-import me.slicecraft.ctf.listeners.BlockPlaceListener;
-import me.slicecraft.ctf.listeners.EntityDamageListener;
+import me.slicecraft.ctf.listeners.*;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -26,6 +24,10 @@ public final class CTF extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new BlockBreakListener(), this);
         getServer().getPluginManager().registerEvents(new BlockPlaceListener(), this);
         getServer().getPluginManager().registerEvents(new EntityDamageListener(), this);
+        getServer().getPluginManager().registerEvents(new PlayerJoinListener(), this);
+        getServer().getPluginManager().registerEvents(new PlayerLeaveListener(), this);
+        getServer().getPluginManager().registerEvents(new InventoryClickListener(), this);
+        getServer().getPluginManager().registerEvents(new PlayerDropItemListener(), this);
         gamemanager = new GameManager();
         gamemanager.startLobbyTimer();
     }

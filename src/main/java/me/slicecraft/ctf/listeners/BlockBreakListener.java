@@ -6,6 +6,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -32,7 +33,7 @@ public class BlockBreakListener implements Listener{
                     if(event.getBlock().getLocation().equals(CTF.gamemanager.flagteam2)){
                         Bukkit.broadcastMessage(ChatColor.GREEN + "Team 1 stole the flag from team 2");
                         CTF.gamemanager.flagholder2 = event.getPlayer().getDisplayName();
-                        event.getPlayer().getInventory().addItem(new ItemStack(Material.GOLD_BLOCK));
+                        event.getPlayer().getInventory().setItem(8, new ItemStack(Material.GOLD_BLOCK, 1));
                         event.setDropItems(false);
                     }else if(event.getBlock().getLocation().equals(CTF.gamemanager.flagteam1)){
                         event.setCancelled(true);
@@ -45,7 +46,7 @@ public class BlockBreakListener implements Listener{
                     if(event.getBlock().getLocation().equals(CTF.gamemanager.flagteam1)) {
                         Bukkit.broadcastMessage(ChatColor.GREEN + "Team 2 stole the flag from team 1");
                         CTF.gamemanager.flagholder1 = event.getPlayer().getDisplayName();
-                        event.getPlayer().getInventory().addItem(new ItemStack(Material.GOLD_BLOCK));
+                        event.getPlayer().getInventory().setItem(8, new ItemStack(Material.GOLD_BLOCK, 1));
                         event.setDropItems(false);
                     }else if(event.getBlock().getLocation().equals(CTF.gamemanager.flagteam2)){
                         event.setCancelled(true);

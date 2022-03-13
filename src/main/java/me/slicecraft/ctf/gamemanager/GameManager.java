@@ -28,6 +28,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -96,11 +97,18 @@ public class GameManager {
                     }else if(time == 1){
                         Bukkit.broadcastMessage(ChatColor.GREEN + "You have " + time + " second left to hide the flag!");
                     }else if(time == 0){
-                        // TODO If timer reaches 0 the block will be place at the players current location unless this is impossible in which case that team auto loses
-                        gamestatus = GameStatus.STARTED;
-                        removeWall();
-                        playermanager.giveItemsToEveryone();
-                        time = 601;
+                        List<Player> playerList = new ArrayList<>(Bukkit.getOnlinePlayers());
+                        Integer noflag = 0;
+                        if(flagteam1 == null) noflag += 1;
+                        if(flagteam2 == null) noflag += 2;
+                        if(noflag != 0){
+                            endGameNoFlag(noflag);
+                        }else{
+                            gamestatus = GameStatus.STARTED;
+                            removeWall();
+                            playermanager.giveItemsToEveryone();
+                            time = 601;
+                        }
                     }
                 }else if(gamestatus == GameStatus.STARTED){
                     if(time == 120 || time == 180 || time == 240 || time == 300 || time == 360 || time == 420 || time == 480 || time == 540 || time == 600){
@@ -108,8 +116,8 @@ public class GameManager {
                     }else if(time == 60){
                         Bukkit.broadcastMessage(ChatColor.GREEN + "You have " + time/60 + " minute left to capture the flag!");
                     }else if(time == 0){
-                        // TODO Make the game end in a tie
-                        Bukkit.broadcastMessage(ChatColor.GREEN + "Placeholder game cancelled");
+                        CTF.gamemanager.endGame(null);
+                        Bukkit.broadcastMessage(ChatColor.GREEN + "Game ended in a tie");
                         gamestatus = GameStatus.NOTSTARTED;
                         time = 61;
                     }
@@ -185,5 +193,104 @@ public class GameManager {
         if(flagteam1 != null && flagteam2 != null){
             time = 0;
         }
+    }
+
+    public void endGameNoPlayers(Integer team){
+        if(team == 1){
+            playermanager.team2players.forEach(player -> {
+                player.sendTitle(ChatColor.GREEN + "You won!", ChatColor.GREEN + "The players from the other team left", 10, 100, 10);
+            });
+        }else if(team == 2){
+            playermanager.team1players.forEach(player -> {
+                player.sendTitle(ChatColor.GREEN + "You won!", ChatColor.GREEN + "The players from the other team left", 10, 100, 10);
+            });
+        }
+        List<Player> playerList = new ArrayList<>(Bukkit.getOnlinePlayers());
+        playerList.forEach(player -> {
+            player.setGameMode(GameMode.SURVIVAL);
+            player.getInventory().clear();
+            player.teleport(new Location(ctfplugin.getServer().getWorld(ctfplugin.getConfig().getString("lobby.world")), ctfplugin.getConfig().getInt("lobby.x"), ctfplugin.getConfig().getInt("lobby.y"), ctfplugin.getConfig().getInt("lobby.z")));
+        });
+        gamestatus = GameStatus.NOTSTARTED;
+        time = 60;
+    }
+
+    public void endGameNoFlag(Integer team){
+        if(team == 1){
+            playermanager.team1players.forEach(player -> {
+                player.sendTitle(ChatColor.RED + "You lost!", ChatColor.RED + "The flag wasn't placed", 10, 100, 10);
+            });
+            playermanager.team2players.forEach(player -> {
+                player.sendTitle(ChatColor.GREEN + "You won!", ChatColor.GREEN + "The other team didn't place the flag", 10, 100, 10);
+            });
+        }else if(team == 2){
+            playermanager.team1players.forEach(player -> {
+                player.sendTitle(ChatColor.GREEN + "You won!", ChatColor.GREEN + "The other team didn't place the flag", 10, 100, 10);
+            });
+            playermanager.team2players.forEach(player -> {
+                player.sendTitle(ChatColor.RED + "You lost!", ChatColor.RED + "The flag wasn't placed", 10, 100, 10);
+            });
+        }else if(team == 3){
+            playermanager.team1players.forEach(player -> {
+                player.sendTitle(ChatColor.RED + "Game over!", ChatColor.RED + "No-one placed a flag!", 10, 100, 10);
+            });
+            playermanager.team2players.forEach(player -> {
+                player.sendTitle(ChatColor.RED + "Game over!", ChatColor.RED + "No-one placed a flag!", 10, 100, 10);
+            });
+        }
+        List<Player> playerList = new ArrayList<>(Bukkit.getOnlinePlayers());
+        playerList.forEach(player -> {
+            player.setGameMode(GameMode.SURVIVAL);
+            player.getInventory().clear();
+            player.teleport(new Location(ctfplugin.getServer().getWorld(ctfplugin.getConfig().getString("lobby.world")), ctfplugin.getConfig().getInt("lobby.x"), ctfplugin.getConfig().getInt("lobby.y"), ctfplugin.getConfig().getInt("lobby.z")));
+        });
+        gamestatus = GameStatus.NOTSTARTED;
+        time = 61;
+    }
+
+    public void endGame(@Nullable Player winner){
+        if(winner != null){
+            playermanager.team1players.forEach(teamplayer -> {
+                if(teamplayer.getDisplayName().equals(winner.getDisplayName())){
+                    playermanager.team1players.forEach(player -> {
+                        player.sendTitle(ChatColor.GREEN + "You won!", ChatColor.GREEN + winner.getDisplayName() + " captured the flag!", 10, 100, 10);
+                        player.teleport(new Location(ctfplugin.getServer().getWorld(ctfplugin.getConfig().getString("lobby.world")), ctfplugin.getConfig().getInt("lobby.x"), ctfplugin.getConfig().getInt("lobby.y"), ctfplugin.getConfig().getInt("lobby.z")));
+                    });
+                    playermanager.team2players.forEach(player -> {
+                        player.sendTitle(ChatColor.RED + "You lost!", ChatColor.RED + winner.getDisplayName() + " captured the flag!", 10, 100, 10);
+                        player.teleport(new Location(ctfplugin.getServer().getWorld(ctfplugin.getConfig().getString("lobby.world")), ctfplugin.getConfig().getInt("lobby.x"), ctfplugin.getConfig().getInt("lobby.y"), ctfplugin.getConfig().getInt("lobby.z")));
+                    });
+                }
+            });
+            playermanager.team2players.forEach(teamplayer -> {
+                if(teamplayer.getDisplayName().equals(winner.getDisplayName())){
+                    playermanager.team1players.forEach(player -> {
+                        player.sendTitle(ChatColor.RED + "You lost!", ChatColor.RED + winner.getDisplayName() + " captured the flag!", 10, 100, 10);
+                        player.teleport(new Location(ctfplugin.getServer().getWorld(ctfplugin.getConfig().getString("lobby.world")), ctfplugin.getConfig().getInt("lobby.x"), ctfplugin.getConfig().getInt("lobby.y"), ctfplugin.getConfig().getInt("lobby.z")));
+                    });
+                    playermanager.team2players.forEach(player -> {
+                        player.sendTitle(ChatColor.GREEN + "You won!", ChatColor.GREEN + winner.getDisplayName() + " captured the flag!", 10, 100, 10);
+                        player.teleport(new Location(ctfplugin.getServer().getWorld(ctfplugin.getConfig().getString("lobby.world")), ctfplugin.getConfig().getInt("lobby.x"), ctfplugin.getConfig().getInt("lobby.y"), ctfplugin.getConfig().getInt("lobby.z")));
+                    });
+                }
+            });
+        }else{
+            playermanager.team1players.forEach(player -> {
+                player.sendTitle(ChatColor.RED + "Game over!", ChatColor.RED + "Game ended in a tie!", 10, 100, 10);
+                player.teleport(new Location(ctfplugin.getServer().getWorld(ctfplugin.getConfig().getString("lobby.world")), ctfplugin.getConfig().getInt("lobby.x"), ctfplugin.getConfig().getInt("lobby.y"), ctfplugin.getConfig().getInt("lobby.z")));
+            });
+            playermanager.team2players.forEach(player -> {
+                player.sendTitle(ChatColor.RED + "Game over!", ChatColor.RED + "Game ended in a tie!", 10, 100, 10);
+                player.teleport(new Location(ctfplugin.getServer().getWorld(ctfplugin.getConfig().getString("lobby.world")), ctfplugin.getConfig().getInt("lobby.x"), ctfplugin.getConfig().getInt("lobby.y"), ctfplugin.getConfig().getInt("lobby.z")));
+            });
+        }
+        List<Player> playerList = new ArrayList<>(Bukkit.getOnlinePlayers());
+        playerList.forEach(player -> {
+            player.setGameMode(GameMode.SURVIVAL);
+            player.getInventory().clear();
+            player.teleport(new Location(ctfplugin.getServer().getWorld(ctfplugin.getConfig().getString("lobby.world")), ctfplugin.getConfig().getInt("lobby.x"), ctfplugin.getConfig().getInt("lobby.y"), ctfplugin.getConfig().getInt("lobby.z")));
+        });
+        gamestatus = GameStatus.NOTSTARTED;
+        time = 60;
     }
 }
