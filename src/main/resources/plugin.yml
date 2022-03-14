@@ -2,13 +2,9 @@ name: CTF
 version: '${project.version}'
 main: me.slicecraft.ctf.CTF
 api-version: 1.18
+author: SliceCraft
+depend: [WorldEdit]
 commands:
-  build:
-    description: Build the map
-    usage: /<command>
   disable:
     description: Disable the plugin
-    usage: /<command>
-  maketeams:
-    description: Make teams
     usage: /<command>

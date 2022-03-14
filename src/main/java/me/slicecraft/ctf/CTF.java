@@ -1,5 +1,6 @@
 package me.slicecraft.ctf;
 
+import me.slicecraft.ctf.commands.DisableCommand;
 import me.slicecraft.ctf.gamemanager.GameManager;
 import me.slicecraft.ctf.listeners.*;
 import org.bukkit.Bukkit;
@@ -17,6 +18,7 @@ public final class CTF extends JavaPlugin {
     public void onEnable() {
         getConfig().options().copyDefaults();
         saveDefaultConfig();
+        getCommand("disable").setExecutor(new DisableCommand());
         getServer().getPluginManager().registerEvents(new BlockBreakListener(), this);
         getServer().getPluginManager().registerEvents(new BlockPlaceListener(), this);
         getServer().getPluginManager().registerEvents(new EntityDamageListener(), this);
