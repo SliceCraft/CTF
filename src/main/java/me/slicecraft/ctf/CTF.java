@@ -1,8 +1,5 @@
 package me.slicecraft.ctf;
 
-import me.slicecraft.ctf.commands.BuildCommand;
-import me.slicecraft.ctf.commands.DisableCommand;
-import me.slicecraft.ctf.commands.MaketeamsCommand;
 import me.slicecraft.ctf.gamemanager.GameManager;
 import me.slicecraft.ctf.listeners.*;
 import org.bukkit.Bukkit;
@@ -20,9 +17,6 @@ public final class CTF extends JavaPlugin {
     public void onEnable() {
         getConfig().options().copyDefaults();
         saveDefaultConfig();
-        getCommand("build").setExecutor(new BuildCommand());
-        getCommand("disable").setExecutor(new DisableCommand());
-        getCommand("maketeams").setExecutor(new MaketeamsCommand());
         getServer().getPluginManager().registerEvents(new BlockBreakListener(), this);
         getServer().getPluginManager().registerEvents(new BlockPlaceListener(), this);
         getServer().getPluginManager().registerEvents(new EntityDamageListener(), this);
