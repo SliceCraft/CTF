@@ -7,7 +7,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 public class InventoryClickListener implements Listener {
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event){
-        if(event.getSlot() == 8){
+        if(event.getSlot() == 8 || event.getHotbarButton() == 8){
             event.setCancelled(true);
         }
     }

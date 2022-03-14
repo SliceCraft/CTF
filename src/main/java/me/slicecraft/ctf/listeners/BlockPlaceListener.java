@@ -25,6 +25,7 @@ public class BlockPlaceListener implements Listener{
         Location location = event.getBlock().getLocation();
         if(!(location.getBlockX() > min(ctfplugin.getConfig().getInt("playarea.pos1.x"), ctfplugin.getConfig().getInt("playarea.pos2.x")) && location.getBlockX() < max(ctfplugin.getConfig().getInt("playarea.pos1.x"), ctfplugin.getConfig().getInt("playarea.pos2.x")) && location.getBlockY() > min(ctfplugin.getConfig().getInt("playarea.pos1.y"), ctfplugin.getConfig().getInt("playarea.pos2.y")) && location.getBlockY() < max(ctfplugin.getConfig().getInt("playarea.pos1.y"), ctfplugin.getConfig().getInt("playarea.pos2.y")) && location.getBlockZ() > min(ctfplugin.getConfig().getInt("playarea.pos1.z"), ctfplugin.getConfig().getInt("playarea.pos2.z")) && location.getBlockZ() < max(ctfplugin.getConfig().getInt("playarea.pos1.z"), ctfplugin.getConfig().getInt("playarea.pos2.z")))){
             event.setCancelled(true);
+            return;
         }
         if(CTF.gamemanager.gamestatus == GameManager.GameStatus.HIDE){
             Player player = event.getPlayer();

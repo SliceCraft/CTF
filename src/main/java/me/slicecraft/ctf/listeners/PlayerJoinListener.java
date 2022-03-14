@@ -14,6 +14,7 @@ public class PlayerJoinListener implements Listener {
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent event){
         event.getPlayer().getInventory().clear();
+        CTF.gamemanager.infomanager.onJoin(event.getPlayer());
         if(CTF.gamemanager.gamestatus != GameManager.GameStatus.NOTSTARTED){
             event.getPlayer().setGameMode(GameMode.SPECTATOR);
             event.getPlayer().teleport(CTF.gamemanager.playermanager.team1players.get(0));

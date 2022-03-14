@@ -18,6 +18,8 @@ public final class CTF extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        getConfig().options().copyDefaults();
+        saveDefaultConfig();
         getCommand("build").setExecutor(new BuildCommand());
         getCommand("disable").setExecutor(new DisableCommand());
         getCommand("maketeams").setExecutor(new MaketeamsCommand());
